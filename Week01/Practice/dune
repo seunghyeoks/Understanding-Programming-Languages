@@ -1,0 +1,29 @@
+(include_subdirs unqualified)
+
+(executable
+ (name helloworld)
+ (modules helloworld))
+
+(library
+ (name foo)
+ (modules foo))
+
+(library
+ (name foo_test)
+ (modules foo_test)
+ (libraries foo)
+ (inline_tests)
+ (preprocess (pps ppx_inline_test)))
+
+
+
+(library
+ (name hw1)
+ (modules hw1))
+
+(library
+ (name hw1_test)
+ (modules hw1_test)
+ (libraries hw1)
+ (inline_tests)
+ (preprocess (pps ppx_inline_test)))

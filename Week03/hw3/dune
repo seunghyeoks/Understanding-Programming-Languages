@@ -1,0 +1,12 @@
+(include_subdirs unqualified)
+
+(library
+ (name hw3)
+ (modules hw3))
+
+(library
+ (name hw3_test)
+ (modules hw3_test)
+ (libraries hw3)
+ (inline_tests)
+ (preprocess (pps ppx_inline_test)))
