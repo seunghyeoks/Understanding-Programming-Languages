@@ -11,7 +11,7 @@ let toCharList (s : string) : char list =
 (* 숫자 char만 들어있는 char list를 TI(int)로 변환하는 함수 *)
 let listToToken (lst : char list) : token =
   match lst with
-  | [] -> failwith "Failed with Lexing"
+  | [] -> failwith "Failed in Lexing"
   | a :: _ -> 
     match a with
     | '+' | '-' | '*' | '/' -> TO a
@@ -28,11 +28,11 @@ let lex (s : string) : token list =
     match q with 
     | Q0 -> 
       (match lst with
-      | [] -> failwith "Failed with Lexing"
+      | [] -> failwith "Failed in Lexing"
       | a :: t -> 
         (match a with
         | '0' .. '9' -> lex' t Q1 (b1 @ [a]) b2  
-        | _ -> failwith "Failed with Lexing"))
+        | _ -> failwith "Failed in Lexing"))
     | Q1 -> 
       (match lst with
       | [] -> b2 @ [listToToken b1]
@@ -40,29 +40,12 @@ let lex (s : string) : token list =
         (match a with
         | '0' .. '9' -> lex' t Q1 (b1 @ [a]) b2  
         | '+' | '-' | '*' | '/' -> lex' t Q2 [a] (b2 @ [listToToken b1])
-        | _ -> failwith "Failed with Lexing"))
+        | _ -> failwith "Failed in Lexing"))
     | Q2 -> 
       (match lst with
       | [] -> b2 @ [listToToken b1]
       | a :: t -> 
         (match a with
-        | '0' .. '9' -> lex' t Q2 [a] (b2 @ [listToToken b1])
-        | _ -> failwith "Failed with Lexing"))
+        | '0' .. '9' -> lex' t Q1 [a] (b2 @ [listToToken b1])
+        | _ -> failwith "Failed in Lexing"))
   in lex' (toCharList s) Q0 [] []
-
-
-
-
-
-
-(*
-    match lst with
-    | [] -> b2 @ [listToToken b1] 
-    | a :: t -> 
-      match a with
-      | '0' .. '9' -> lex' t (b1 @ [a]) b2  
-      | '+' | '-' | '*' | '/' ->  let _ = b2 @ [listToToken b1] in 
-                                  let b1 = [] in                 
-                                  lex' t b1 (b2 @ [TO a])       
-      | _ -> failwith "Failed with Lexing"
-  *)
