@@ -14,15 +14,16 @@ let toIntToken (lst : char list) : token =
 
 
 let lex (s : string) : token list = 
-  let charlst : char list = toCharList s  in
+  let charlst : char list = toCharList s in
   let buffer1 : char list = [] in
   let buffer2 : token list = [] in 
   let _ = List.iter (fun x -> 
-      match x with
-      | ('0' .. '9') -> buffer1 @ [x]
-      | '+' -> let _ = buffer2 @ [toIntToken buffer1] in let buffer1 = [] in buffer2 @ x
-      | '-' -> let _ = buffer2 @ [toIntToken buffer1] in let buffer1 = [] in buffer2 @ x
-      | '*' -> let _ = buffer2 @ [toIntToken buffer1] in let buffer1 = [] in buffer2 @ x
-      | '/' -> let _ = buffer2 @ [toIntToken buffer1] in let buffer1 = [] in buffer2 @ x
-      | _   -> failwith "Failed in Lexing"
-    ) charlst 
+            match x with
+            | ('0' .. '9') -> buffer1 @ [x]
+            | '+' -> begin buffer2 = buffer2 @ [toIntToken buffer1] ; buffer1 = [] ; buffer2 = buffer2 @ [x] end
+            | '-' -> begin buffer2 = buffer2 @ [toIntToken buffer1] ; buffer1 = [] ; buffer2 = buffer2 @ [x] end
+            | '*' -> begin buffer2 = buffer2 @ [toIntToken buffer1] ; buffer1 = [] ; buffer2 = buffer2 @ [x] end
+            | '/' -> begin buffer2 = buffer2 @ [toIntToken buffer1] ; buffer1 = [] ; buffer2 = buffer2 @ [x] end
+            | _   -> failwith "Failed in Lexing"
+          ) charlst in 
+  let _ = List.iter (Format.printf "%a ") buffer2
