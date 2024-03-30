@@ -12,6 +12,7 @@ let listToTI (lst : char list) : token =
   let lst = int_of_string lst in
   TI lst
 
+let view s = [TO s]
 
 let lex (s : string) : token list = 
   let charlst : char list = toCharList s in
@@ -19,7 +20,7 @@ let lex (s : string) : token list =
   let buffer2 : token list = [] in 
   let rec lex' lst b1 b2 = 
     match lst with
-    | [] -> b2
+    | [] -> let b2_ = b2 @ [listToTI b1] in b2_
     | a :: t -> 
       match a with
       | '0' .. '9' -> lex' t (b1 @ [a]) b2
