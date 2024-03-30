@@ -3,3 +3,10 @@
 (library
  (name hw4)
  (modules hw4))
+
+(library
+ (name hw4_test)
+ (modules hw4_test)
+ (libraries hw4)
+ (inline_tests)
+ (preprocess (pps ppx_inline_test)))
