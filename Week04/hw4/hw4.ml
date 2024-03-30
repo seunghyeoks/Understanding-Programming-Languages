@@ -1,4 +1,5 @@
 type token = TI of int | TO of char
+type state = Q0 | Q1 | Q2
 
 (* String에서 공백을 제외한 글자를 하나씩 뽑아 char list로 반환하는 함수 *)
 let toCharList (s : string) : char list = 
@@ -8,24 +9,60 @@ let toCharList (s : string) : char list =
   s
 
 (* 숫자 char만 들어있는 char list를 TI(int)로 변환하는 함수 *)
-let listToTI (lst : char list) : token =
-  let lst = List.to_seq lst in
-  let lst = String.of_seq lst in
-  let lst = int_of_string lst in
-  TI lst
+let listToToken (lst : char list) : token =
+  match lst with
+  | [] -> failwith "Failed with Lexing"
+  | a :: _ -> 
+    match a with
+    | '+' | '-' | '*' | '/' -> TO a
+    | _ ->  let lst = List.to_seq lst in
+            let lst = String.of_seq lst in
+            let lst = int_of_string lst in
+            TI lst
+
+
 
 (* 재귀로 구현 *)
-let lex (s : string) : token list =  
-  let rec lex' lst b1 b2 = 
+let lex (s : string) : token list =
+  let rec lex' lst q b1 b2 = 
+    match q with 
+    | Q0 -> 
+      (match lst with
+      | [] -> failwith "Failed with Lexing"
+      | a :: t -> 
+        (match a with
+        | '0' .. '9' -> lex' t Q1 (b1 @ [a]) b2  
+        | _ -> failwith "Failed with Lexing"))
+    | Q1 -> 
+      (match lst with
+      | [] -> b2 @ [listToToken b1]
+      | a :: t -> 
+        (match a with
+        | '0' .. '9' -> lex' t Q1 (b1 @ [a]) b2  
+        | '+' | '-' | '*' | '/' -> lex' t Q2 [a] (b2 @ [listToToken b1])
+        | _ -> failwith "Failed with Lexing"))
+    | Q2 -> 
+      (match lst with
+      | [] -> b2 @ [listToToken b1]
+      | a :: t -> 
+        (match a with
+        | '0' .. '9' -> lex' t Q2 [a] (b2 @ [listToToken b1])
+        | _ -> failwith "Failed with Lexing"))
+  in lex' (toCharList s) Q0 [] []
+
+
+
+
+
+
+(*
     match lst with
-    | [] -> 
-            if b1 = [] then b2  
-            else b2 @ [listToTI b1] 
+    | [] -> b2 @ [listToToken b1] 
     | a :: t -> 
-            match a with
-            | '0' .. '9' -> lex' t (b1 @ [a]) b2  
-            | '+' | '-' | '*' | '/' ->  let _ = b2 @ [listToTI b1] in 
-                                        let b1 = [] in                 
-                                        lex' t b1 (b2 @ [TO a])       
-            | _ -> failwith "Failed with Lexing"
-  in lex' (toCharList s) [] []
+      match a with
+      | '0' .. '9' -> lex' t (b1 @ [a]) b2  
+      | '+' | '-' | '*' | '/' ->  let _ = b2 @ [listToToken b1] in 
+                                  let b1 = [] in                 
+                                  lex' t b1 (b2 @ [TO a])       
+      | _ -> failwith "Failed with Lexing"
+  *)
