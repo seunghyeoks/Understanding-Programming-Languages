@@ -1,0 +1,12 @@
+(include_subdirs unqualified)
+
+(library
+ (name hw5)
+ (modules hw5))
+
+(library
+ (name hw5_test)
+ (modules hw5_test)
+ (libraries hw5)
+ (inline_tests)
+ (preprocess (pps ppx_inline_test)))
