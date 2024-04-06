@@ -28,6 +28,11 @@ let listToToken (b1 : char list) : token =
             TI b1
 
 
+let extractRemain lst = 
+    match lst with 
+    | _ :: remain -> remain
+    | [] -> []
+
 
 (* 재귀와 삼중 타입 매칭으로 구현 *)
 let lex (s : string) : token list =
@@ -62,30 +67,37 @@ let lex (s : string) : token list =
 (* parser 만들기 *)
 let parse (tl : token list) : expr = 
   let rec parse' (tl : token list) (stck : stack_elem list) : expr = 
-    match tl with
-    | [] -> (* finished?, stck 최적화 필수 *)
-        (match stck with 
-        | Expr a :: [] -> a
-        | _ -> failwith "Failed in Parsing")
+    match stck with
+    | Token (TI n) :: stck_remain ->  (* reduce *)
+      parse' tl (Expr (Num n) :: stck_remain)
+
+    | Token (TO c) :: stck_remain ->  (* reduce *)
+      (match c with
+      | '+' -> parse' tl (Op ADD :: stck_remain)
+      | '-' -> parse' tl (Op SUB :: stck_remain)
+      | '*' -> parse' tl (Op MUL :: stck_remain)
+      | '/' -> parse' tl (Op DIV :: stck_remain) 
+      | _ -> parse' tl (Op DIV :: stck_remain) )
+
+    | Expr e1 :: Op op :: Expr e2 :: stck_remain -> 
+      (match tl with
+      | [] -> parse' tl (Expr (E (op, e2, e1)) :: stck_remain)  (* reduce *)
+      | t :: _ ->  (* lookahead *)
+        (match t with 
+        | TO '*' | TO '/' -> parse' (extractRemain tl) (Token t :: stck)  (* shift *)
+        | _ -> parse' tl (Expr (E (op, e2, e1)) :: stck_remain)))  (* reduce *)
       
-    | a :: tl_remain -> 
-        (match stck with                                  
-        | Token (TI n) :: stck_remain -> 
-          parse' tl (Expr (Num n) :: stck_remain)   (* reduce *)
+    | _ ->  
+      (match tl with
+      | t :: _ -> parse' (extractRemain tl) (Token t :: stck)   (* shift *) 
+      | [] ->  (* final *)
+        (match stck with
+        | Expr e :: [] -> e  (* success *)
+        | _ -> failwith "Failed in Parsing"))  (* failed *)
 
-        | Token (TO c) :: stck_remain ->
-          (match c with
-          | '+' -> parse' tl (Op ADD :: stck_remain)
-          | '-' -> parse' tl (Op SUB :: stck_remain)
-          | '*' -> parse' tl (Op MUL :: stck_remain)
-          | '/' -> parse' tl (Op DIV :: stck_remain) 
-          | _ -> parse' tl (Op DIV :: stck_remain) )  (* reduce *)
+      
 
-        | Expr e1 :: Op op :: Expr e2 :: stck_remain -> 
-          (match op with
-          | ADD | SUB -> parse' tl (Expr (E (op, e2, e1)) :: stck_remain)   (* reduce *)
-          | MUL | DIV -> parse' tl_remain (Token a :: stck_remain) )   (* shift *)
-          
-        | _ :: stck_remain -> parse' tl_remain (Token a :: stck_remain)    (* shift *)
-        | [] -> parse' tl_remain [Token a] )
   in parse' tl []
+
+
+  (* ADD | SUB ->     *)
