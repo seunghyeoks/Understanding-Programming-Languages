@@ -12,6 +12,7 @@ let toCharList (s : string) : char list =
   let s = List.of_seq s in 
   let s = List.filter (fun x -> (x != ' ')) s in
   s
+  
 
 (* char list의 맨 앞 요소를 확인하여 알맞은 토큰으로 변환하는 함수 *)
 let listToToken (b1 : char list) : token =
@@ -81,7 +82,7 @@ let parse (tl : token list) : expr =
         (match tl with
         | t :: tl_remain ->     (* lookahead *)
           (match t with 
-          | TO '*' | TO '/' -> parse' tl_remain (Token t :: stck)  (* shift *)
+          | TO '*' | TO '/' -> parse' tl_remain (Token t :: stck)   (* shift *)
           | _ -> parse' tl (Expr (E (op, e2, e1)) :: stck_remain))  (* reduce *)
         | _ -> parse' tl (Expr (E (op, e2, e1)) :: stck_remain))  (* reduce *)
       | _ -> parse' tl (Expr (E (op, e2, e1)) :: stck_remain))  (* reduce *)
@@ -91,7 +92,7 @@ let parse (tl : token list) : expr =
       | t :: tl_remain -> parse' tl_remain (Token t :: stck)   (* shift *) 
       | [] ->         (* final *)
         (match stck with
-        | Expr e :: [] -> e  (* success *)
-        | _ -> failwith "Failed in Parsing"))  (* failed *)
+        | Expr e :: [] -> e  (* SUCCESS *)
+        | _ -> failwith "Failed in Parsing"))  (* FAILED *)
 
   in parse' tl []
