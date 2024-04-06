@@ -13,8 +13,6 @@ let toCharList (s : string) : char list =
   let s = List.filter (fun x -> (x != ' ')) s in
   s
 
-
-
 (* char list의 맨 앞 요소를 확인하여 알맞은 토큰으로 변환하는 함수 *)
 let listToToken (b1 : char list) : token =
   match b1 with
@@ -28,13 +26,8 @@ let listToToken (b1 : char list) : token =
             TI b1
 
 
-let extractRemain lst = 
-    match lst with 
-    | _ :: remain -> remain
-    | [] -> []
 
-
-(* 재귀와 삼중 타입 매칭으로 구현 *)
+(* lexer: 재귀와 삼중 타입 매칭으로 구현 *)
 let lex (s : string) : token list =
   let rec lex' lst q b1 b2 = 
     match q with 
@@ -45,6 +38,7 @@ let lex (s : string) : token list =
         (match a with
         | '0' .. '9' -> lex' t Q1 (b1 @ [a]) b2   (*  (q0,[0-9]) -> q1   *)
         | _ -> failwith "Failed in Lexing"))      (*  fail at q0  *)
+
     | Q1 -> 
       (match lst with
       | [] -> b2 @ [listToToken b1]               (*  final at q1 *)
@@ -53,6 +47,7 @@ let lex (s : string) : token list =
         | '0' .. '9' -> lex' t Q1 (b1 @ [a]) b2   (*  (q1,[0-9]) -> q1  *)
         | '+' | '-' | '*' | '/' -> lex' t Q2 [a] (b2 @ [listToToken b1])  (*  (q1,[+|-|*|/]) -> q2  *)
         | _ -> failwith "Failed in Lexing"))      (*  fail at q1  *)
+
     | Q2 -> 
       (match lst with
       | [] -> b2 @ [listToToken b1]               (*  final at q2  *)
@@ -60,11 +55,12 @@ let lex (s : string) : token list =
         (match a with
         | '0' .. '9' -> lex' t Q1 [a] (b2 @ [listToToken b1]) (*  (q2,[0-9]) -> q1  *)
         | _ -> failwith "Failed in Lexing"))      (*  fail at q2  *)
+
   in lex' (toCharList s) Q0 [] []
 
 
 
-(* parser 만들기 *)
+(* parser: 스택에 대한 pattern matching으로 구현 *)
 let parse (tl : token list) : expr = 
   let rec parse' (tl : token list) (stck : stack_elem list) : expr = 
     match stck with
@@ -80,24 +76,22 @@ let parse (tl : token list) : expr =
       | _ -> parse' tl (Op DIV :: stck_remain) )
 
     | Expr e1 :: Op op :: Expr e2 :: stck_remain -> 
-      (match tl with
-      | [] -> parse' tl (Expr (E (op, e2, e1)) :: stck_remain)  (* reduce *)
-      | t :: _ ->  (* lookahead *)
-        (match t with 
-        | TO '*' | TO '/' -> parse' (extractRemain tl) (Token t :: stck)  (* shift *)
-        | _ -> parse' tl (Expr (E (op, e2, e1)) :: stck_remain)))  (* reduce *)
-      
+      (match op with
+      | ADD | SUB ->
+        (match tl with
+        | t :: tl_remain ->     (* lookahead *)
+          (match t with 
+          | TO '*' | TO '/' -> parse' tl_remain (Token t :: stck)  (* shift *)
+          | _ -> parse' tl (Expr (E (op, e2, e1)) :: stck_remain))  (* reduce *)
+        | _ -> parse' tl (Expr (E (op, e2, e1)) :: stck_remain))  (* reduce *)
+      | _ -> parse' tl (Expr (E (op, e2, e1)) :: stck_remain))  (* reduce *)
+
     | _ ->  
       (match tl with
-      | t :: _ -> parse' (extractRemain tl) (Token t :: stck)   (* shift *) 
-      | [] ->  (* final *)
+      | t :: tl_remain -> parse' tl_remain (Token t :: stck)   (* shift *) 
+      | [] ->         (* final *)
         (match stck with
         | Expr e :: [] -> e  (* success *)
         | _ -> failwith "Failed in Parsing"))  (* failed *)
 
-      
-
   in parse' tl []
-
-
-  (* ADD | SUB ->     *)
