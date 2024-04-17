@@ -1,0 +1,17 @@
+(include_subdirs unqualified)
+
+
+(executable
+ (name func)
+ (modules func))
+
+(library
+ (name gcd)
+ (modules gcd))
+
+(library
+ (name lecture_test)
+ (modules lecture_test)
+ (libraries gcd)
+ (inline_tests)
+ (preprocess (pps ppx_inline_test)))
