@@ -1,0 +1,1 @@
+let%test _ = Gcd.gcd 12 6 = 6
