@@ -1,0 +1,7 @@
+(include_subdirs unqualified)
+
+
+(executable
+ (name shadowing)
+ (modules shadowing))
+
