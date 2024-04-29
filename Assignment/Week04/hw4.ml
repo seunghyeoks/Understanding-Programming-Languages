@@ -1,3 +1,5 @@
+(* 입력받은 문자열을 토큰화 하여 토큰 리스트를 반환하는 lexer 만들어보기 *)
+
 type token = TI of int | TO of char
 type state = Q0 | Q1 | Q2
 
@@ -7,7 +9,7 @@ type state = Q0 | Q1 | Q2
 let toCharList (s : string) : char list = 
   let s = String.to_seq s in 
   let s = List.of_seq s in 
-  let s = List.filter (fun x -> (x != ' ')) s in
+  let s = List.filter (fun x -> (x <> ' ')) s in
   s
 
 

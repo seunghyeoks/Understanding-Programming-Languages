@@ -1,3 +1,5 @@
+(* AST를 해석하여 결과값을 계산하는 interpreter, 7주차에 많이 다듬었으니 7주차로 *)
+
 let addV (v1:Value.t) (v2:Value.t) : Value.t = 
   match v1, v2 with
   | NumV v1, NumV v2 -> NumV (v1 + v2)

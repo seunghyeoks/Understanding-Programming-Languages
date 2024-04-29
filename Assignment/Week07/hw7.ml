@@ -1,3 +1,5 @@
+(* var, let in이 추가된 abstract syntax를 해석하는 interpreter *)
+
 let rec interp (e : Ast.expr) (t : Store.t) : Store.value = 
   match e with
   | Ast.Num (n) -> Store.NumV n

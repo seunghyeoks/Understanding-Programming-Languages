@@ -1,3 +1,5 @@
+(* length & reverse *)
+
 let len lst = 
   let rec len' lst acc = 
     match lst with

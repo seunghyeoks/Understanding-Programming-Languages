@@ -1,3 +1,6 @@
+(* if then else, 패턴매칭, 재귀를 이용한 4가지 함수
+   -> tail call optimization이 안되어 있음 *)
+   
 let rec factorial i = 
   if i < 0 then -1 else
   match i with

@@ -1,3 +1,5 @@
+(* finite automata 구현 *)
+
 type op = ADD | SUB | MUL | DIV
 type value = Int of int | Float of float | Err
 type expr = E of op * expr * expr | V of value
@@ -14,6 +16,7 @@ let foperate op l r =
 
 
 
+(* expr -> value, 일종의 interpreter 같기도 하고 *)
 let rec eval expr =
   match expr with
   | V v -> v

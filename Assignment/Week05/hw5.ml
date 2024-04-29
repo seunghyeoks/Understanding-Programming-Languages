@@ -1,3 +1,5 @@
+(* lexer를 통해 토큰화된 프로그램을 AST로 변환하는 parser 만들기 *)
+
 type token = TI of int | TO of char
 type state = Q0 | Q1 | Q2
 type op = ADD | SUB | MUL | DIV
@@ -10,7 +12,7 @@ type stack_elem = Token of token | Expr of expr | Op of op
 let toCharList (s : string) : char list = 
   let s = String.to_seq s in 
   let s = List.of_seq s in 
-  let s = List.filter (fun x -> (x != ' ')) s in
+  let s = List.filter (fun x -> (x <> ' ')) s in
   s
   
 
