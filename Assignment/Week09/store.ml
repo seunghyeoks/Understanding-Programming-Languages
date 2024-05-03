@@ -1,4 +1,4 @@
-(* 추상메모리에 대한 구현 *)
+(* 추상메모리(σ)에 대한 구현 *)
 
 type value = NumV of int
 type t = (string * value) list
