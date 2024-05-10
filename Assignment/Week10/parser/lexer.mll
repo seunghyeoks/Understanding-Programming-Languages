@@ -8,7 +8,7 @@
 let pos_digit = ['1'-'9']
 let digit = ['0'-'9']
 let pos_number = pos_digit digit*
-let number = "0" | pos_number
+let number = "0" | pos_number | '-' pos_number
 
 (* White space *)
 let ws = [' ''\t''\n']*
@@ -25,6 +25,8 @@ rule read =
   | "~" { NEG }
   | "let" { KW_LET }
   | "in" { KW_IN }
+  | "fun" { KW_FUN }
+  | "->" { ARROW }
   | "=" { EQ }
   | number as n { NUMBER (int_of_string n) }
   | ident as id { ID id }

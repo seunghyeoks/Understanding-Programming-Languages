@@ -1,7 +1,8 @@
 (* 추상메모리에 대한 구현 *)
 
-type value = NumV of int
 type t = (string * value) list
+and value = NumV of int
+  | ClosureV of string * Ast.expr * t
 
 let empty : t = [] 
 

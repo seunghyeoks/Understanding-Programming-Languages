@@ -14,16 +14,17 @@
 
 (library 
  (name store)
- (modules store))
+ (modules store)
+ (libraries ast))
 
 (library
- (name hw7)
- (modules hw7)
+ (name hw10)
+ (modules hw10)
  (libraries store ast))
 
 (library
- (name hw7_test)
- (modules hw7_test)
- (libraries hw7 parserMain)
+ (name hw10_test)
+ (modules hw10_test)
+ (libraries hw10 parserMain)
  (inline_tests)
  (preprocess (pps ppx_inline_test)))
