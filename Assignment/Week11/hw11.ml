@@ -43,6 +43,6 @@ let rec interp (e : Ast.expr) (t : Store.t) : Store.value =
     let n2 = interp e2 t in
     begin 
       match n1, n2 with
-      | NumV n1, NumV n2 -> if n1 < n2 then ClosureV ("true", Ast.true_encoding, t) else ClosureV ("false", Ast.false_encoding, t)
+      | NumV n1, NumV n2 -> if n1 < n2 then interp Ast.true_encoding t else interp Ast.false_encoding t
       | _ -> failwith (Format.asprintf "[Error] Not a number: %a < %a" Ast.pp e1 Ast.pp e2)
     end
