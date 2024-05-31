@@ -10,21 +10,23 @@
  (modules parserMain parser lexer)
  (libraries ast))
 
-
+(library 
+ (name value)
+ (modules value))
 
 (library 
  (name store)
  (modules store)
- (libraries ast))
+ (libraries ast value))
 
 (library
- (name hw12)
- (modules hw12)
+ (name hw13)
+ (modules hw13)
  (libraries store ast))
 
 (library
- (name hw12_test)
- (modules hw12_test)
- (libraries hw12 parserMain)
+ (name hw13_test)
+ (modules hw13_test)
+ (libraries hw13 parserMain)
  (inline_tests)
  (preprocess (pps ppx_inline_test)))
