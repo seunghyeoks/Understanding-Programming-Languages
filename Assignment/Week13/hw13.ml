@@ -14,7 +14,7 @@ let rec interp_expr (e : Ast.expr) (t : Store.t) : Value.t =
     begin 
       match n1, n2 with
       | NumV n1, NumV n2 -> NumV (n1 + n2)
-      | _ -> failwith (Format.asprintf "[Error] Not a number: %a + %a" Ast.pp_expr e1 Ast.pp_expr e2)
+      | _ -> failwith (Format.asprintf "[Error] Not a Number: %a + %a" Ast.pp_expr e1 Ast.pp_expr e2)
     end
     
   | Ast.Sub (e1, e2) -> 
@@ -23,7 +23,7 @@ let rec interp_expr (e : Ast.expr) (t : Store.t) : Value.t =
     begin 
       match n1, n2 with
       | NumV n1, NumV n2 -> NumV (n1 - n2)
-      | _ -> failwith (Format.asprintf "[Error] Not a number: %a - %a" Ast.pp_expr e1 Ast.pp_expr e2)
+      | _ -> failwith (Format.asprintf "[Error] Not a Number: %a - %a" Ast.pp_expr e1 Ast.pp_expr e2)
     end
 
   | Ast.Lt (e1, e2) ->
@@ -32,7 +32,7 @@ let rec interp_expr (e : Ast.expr) (t : Store.t) : Value.t =
     begin 
       match n1, n2 with
       | NumV n1, NumV n2 -> if n1 < n2 then (Value.BoolV true) else (Value.BoolV false)
-      | _ -> failwith (Format.asprintf "[Error] Not a number: %a < %a" Ast.pp_expr e1 Ast.pp_expr e2)
+      | _ -> failwith (Format.asprintf "[Error] Not a Number: %a < %a" Ast.pp_expr e1 Ast.pp_expr e2)
     end
 
   | Ast.Gt (e1, e2) ->
@@ -41,7 +41,7 @@ let rec interp_expr (e : Ast.expr) (t : Store.t) : Value.t =
     begin 
       match n1, n2 with
       | NumV n1, NumV n2 -> if n1 > n2 then (Value.BoolV true) else (Value.BoolV false)
-      | _ -> failwith (Format.asprintf "[Error] Not a number: %a > %a" Ast.pp_expr e1 Ast.pp_expr e2)
+      | _ -> failwith (Format.asprintf "[Error] Not a Number: %a > %a" Ast.pp_expr e1 Ast.pp_expr e2)
     end
 
   | Ast.Eq (e1, e2) ->
@@ -69,7 +69,7 @@ let rec interp_expr (e : Ast.expr) (t : Store.t) : Value.t =
     begin 
       match b1, b2 with
       | BoolV v1, BoolV v2 -> BoolV (v1 || v2)
-      | _ -> failwith (Format.asprintf "[Error] Not a Bool: %a && %a" Ast.pp_expr e1 Ast.pp_expr e2)
+      | _ -> failwith (Format.asprintf "[Error] Not a Bool: %a || %a" Ast.pp_expr e1 Ast.pp_expr e2)
     end
 
 
