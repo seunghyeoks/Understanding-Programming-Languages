@@ -1,4 +1,4 @@
-let%test _ = Hw13.interp_prog (ParserMain.parse "x = 3; y = 0; while x > 0 { y = y + x; x = x - 1;}") = [("x", Value.NumV 0); ("y", Value.NumV 6)]
+let%test _ = Hw13.interp_prog (ParserMain.parse "x = 3; y = 0; while x > 0 { y = y + x; x = x - 1; z = 1;}") = [("z", Value.NumV 1);("x", Value.NumV 0); ("y", Value.NumV 6)]
 let%test _ = Hw13.interp_prog (ParserMain.parse "x = 3; y = 7; z = x < y; if z { z = y - x;}") = [("z", Value.NumV 4); ("y", Value.NumV 7); ("x", Value.NumV 3)]
 let%test _ = Hw13.interp_prog (ParserMain.parse "x = 3; y = 7; z = x < y; if x > y {y = x - 4;} if y == -1 { y = x - 4;} else { z = x + y; z = z - 5;}") = [("z", Value.NumV 5); ("y", Value.NumV 7); ("x", Value.NumV 3)]
 
