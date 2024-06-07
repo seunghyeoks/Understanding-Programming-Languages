@@ -10,19 +10,38 @@
  (modules parserMain parser lexer)
  (libraries ast))
 
-(library 
- (name value)
- (modules value))
+
+
 
 (library 
- (name store)
- (modules store)
- (libraries ast value))
+ (name env)
+ (modules env))
+
+(library 
+ (name addrManager)
+ (modules addrManager))
+
+
+(library 
+ (name value)
+ (modules value)
+ (libraries env))
+
+(library 
+ (name memory)
+ (modules memory)
+ (libraries env value ast))
+
+(library 
+ (name fstore)
+ (modules fstore)
+ (libraries ast))
+
 
 (library
  (name hw14)
  (modules hw14)
- (libraries store ast))
+ (libraries fstore ast env memory value addrManager))
 
 (library
  (name hw14_test)
