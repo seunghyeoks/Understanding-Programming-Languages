@@ -1,0 +1,32 @@
+(include_subdirs unqualified)
+
+
+(library 
+ (name ast)
+ (modules ast))
+
+(library
+ (name parserMain)
+ (modules parserMain parser lexer)
+ (libraries ast))
+
+(library 
+ (name value)
+ (modules value))
+
+(library 
+ (name store)
+ (modules store)
+ (libraries ast value))
+
+(library
+ (name hw14)
+ (modules hw14)
+ (libraries store ast))
+
+(library
+ (name hw14_test)
+ (modules hw14_test)
+ (libraries hw14 parserMain)
+ (inline_tests)
+ (preprocess (pps ppx_inline_test)))
