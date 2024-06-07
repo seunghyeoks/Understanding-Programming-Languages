@@ -14,7 +14,7 @@ let add (a : Env.addr) (v : Value.t) (t : t) : t =
 
 let rec find (a : Env.addr) (t : t) : Value.t =
   match t with
-  | [] -> failwith ("[Error] Free address:" ^ (string_of_int a))
+  | [] -> failwith ("[Error] Free address: " ^ (string_of_int a))
   | fst :: remain -> 
     (match fst with
     | (ref, v) -> 

@@ -13,7 +13,7 @@ let add (s : string) (arg : string list) (body : Ast.stmt list) (t : t) : t =
 
 let rec find (s : string) (t : t) : (string list * Ast.stmt list) = 
   match t with
-  | [] -> failwith ("[Error] Free identifier: " ^ s)
+  | [] -> failwith ("[Error] Unbound function: " ^ s)
   | fst :: remain -> 
     (match fst with
     | (var, arg, body) -> 

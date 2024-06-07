@@ -6,7 +6,7 @@ let rec interp_expr (e : Ast.expr) (em : Env.t * Memory.t) : Value.t =
 
   | (_, _), Ast.Bool (b) -> Value.BoolV b
 
-  | (s, _), Ast.Ref (r) -> Value.AddrV (Env.find r s)
+  | (s, _), Ast.Ref (x) -> Value.AddrV (Env.find x s)
 
   | (s, m), Ast.Id (x) -> Memory.find (Env.find x s) m
 
@@ -77,25 +77,24 @@ let rec interp_expr (e : Ast.expr) (em : Env.t * Memory.t) : Value.t =
 
 
 
-
-let rec interp_emlist (em : Env.t * Memory.t) (el : Ast.expr list) (xl : string list) : Env.t * Memory.t =
-  match em , el, xl with
-  | (s, m), e :: e_remain, x :: x_remain -> 
-    let v = interp_expr e (s, m) in
-    let a = AddrManager.new_addr in
-    let new_s = Env.add x (a ()) s in
-    let new_m = Memory.add (a ()) v m in
-    interp_emlist (new_s, new_m) e_remain x_remain
-  | (s, m), [], [] -> (s, m)
-  | _, _, _ -> failwith (Format.asprintf "[Error]")
-
-
 let rec interp_stmt (t : Fstore.t) (stmt : Ast.stmt) (em : Env.t * Memory.t) : Env.t * Memory.t = 
   match em, stmt with
   | (s, m), Ast.DefStmt (x) -> 
-    let a = AddrManager.new_addr in
-    let new_s = Env.add x (a ()) s in 
+    let a = AddrManager.new_addr () in
+    let new_s = Env.add x a s in 
     (new_s, m)
+
+  | (s, m), Ast.LoadStmt (x, e) ->
+    let sx = Env.find x s in
+    let a = interp_expr e (s, m) in
+    begin 
+      match a with
+      | AddrV a -> 
+        let ma = Memory.find a m in
+        let new_m = Memory.add sx ma m in
+        (s, new_m)
+      | _ -> failwith (Format.asprintf "[Error] Not an Address: %a" Ast.pp_expr e)
+    end
 
   | (s, m), Ast.StoreStmt (e1, e2) ->
     let a = interp_expr e1 (s, m) in 
@@ -105,23 +104,11 @@ let rec interp_stmt (t : Fstore.t) (stmt : Ast.stmt) (em : Env.t * Memory.t) : E
       | AddrV a -> let new_m = Memory.add a v m in (s, new_m)
       | _ -> failwith (Format.asprintf "[Error] Not an Address: %a" Ast.pp_expr e1)
     end
-    
-  | (s, m), Ast.LoadStmt (x, e) ->
-    let sx = Env.find x s in
-    let a = interp_expr e (s, m) in
-    begin 
-      match a with
-      | AddrV a -> 
-        let ma = Memory.find a m in
-        let m2 = Memory.add sx ma m in
-        (s, m2)
-      | _ -> failwith (Format.asprintf "[Error] Not an Address: %a" Ast.pp_expr e)
-    end
 
   | (s, m), Ast.IfStmt (e, sl1, sl2) ->
-    let eb = interp_expr e (s, m) in
+    let b = interp_expr e (s, m) in
     begin
-      match eb with
+      match b with
       | BoolV b -> 
         if b then 
           let (_, m1) = interp_stmtlist t sl1 (s, m) in (s, m1) 
@@ -148,14 +135,26 @@ let rec interp_stmt (t : Fstore.t) (stmt : Ast.stmt) (em : Env.t * Memory.t) : E
     (s, new_m)
 
   | (s, m), Ast.CallStmt (x, f, el) ->
-    let (xl, sl) = Fstore.find f t in    
-    let (new_s, new_m) = interp_emlist (s, m) el xl in
-    let (_, mp) = interp_stmtlist t sl (new_s, new_m) in
+    let (xl, sl) = Fstore.find f t in
+    let rec interp_emlist (em : Env.t * Memory.t) (el : Ast.expr list) (xl : string list) (acc : Env.t * Memory.t) : Env.t * Memory.t =
+      begin
+        match em, el, xl, acc with
+          | (s,m), e1 :: e_remain, x1 :: x_remain, (acc_s, acc_m) -> 
+            let a1 = AddrManager.new_addr () in
+            let v1 = interp_expr e1 (s,m) in
+            let acc_s = Env.add x1 a1 acc_s in
+            let acc_m = Memory.add a1 v1 acc_m in
+            interp_emlist (s,m) e_remain x_remain (acc_s, acc_m)
+          | _, [], [], (acc_s, acc_m) -> (acc_s, acc_m)
+          | _, _, _, _ -> failwith (Format.asprintf "[Error] arguments mismatch") 
+      end in
+    let (s_to_n, m_to_n) = interp_emlist (s, m) el xl (s, m) in
+    let (_, mp) = interp_stmtlist t sl (s_to_n, m_to_n) in
     let sx = Env.find x s in
     let mpret = Memory.find AddrManager.ret_addr mp in
     let new_mp = Memory.add sx mpret mp in
     (s, new_mp)
-
+      
 (* let, rec 다 빼야 됨 *)
 and interp_stmtlist (t : Fstore.t) (sl : Ast.stmt list) (em : Env.t * Memory.t) : Env.t * Memory.t = 
   match sl with
@@ -163,14 +162,17 @@ and interp_stmtlist (t : Fstore.t) (sl : Ast.stmt list) (em : Env.t * Memory.t) 
   | [] -> em
 
 
+
 let interp_def (d : Ast.def) (t : Fstore.t) : Fstore.t = 
   match d with
   | Ast.FunDef (f, xl, stl) -> Fstore.add f xl stl t
+
+
 
 let interp_prog (p : Ast.prog) : Env.t * Memory.t = 
   let _ = AddrManager.init () in
   match p with
   | Ast.Program (defl, stmtl) -> 
-    let lamda = List.fold_right interp_def defl Fstore.empty  in
+    let lamda = List.fold_right interp_def defl Fstore.empty in
     let (s, m) = interp_stmtlist lamda stmtl (Env.empty, Memory.empty) in
     (s, m)
