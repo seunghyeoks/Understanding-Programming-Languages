@@ -10,3 +10,9 @@ Week04: Lexer
 Week05: Parser
 Week06: interpretor for AE
 Week07: interpretor for VAE
+Week09:
+Week10:
+Week11:
+Week12:
+Week13: miniC interpetor 1
+Week14: miniC interpetor 2
