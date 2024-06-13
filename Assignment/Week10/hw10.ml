@@ -1,4 +1,5 @@
 (* FVAE를 해석하는 interpreter *)
+(* High-order function, Multiple parameterf를 지원하도록 작성 *)
 
 let rec interp (e : Ast.expr) (t : Store.t) : Store.value = 
   match e with

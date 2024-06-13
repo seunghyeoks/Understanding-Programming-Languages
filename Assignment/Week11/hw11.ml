@@ -1,4 +1,5 @@
 (* CFVAE를 해석하는 interpreter *)
+(* True, False를 ClosureV를 사용해 구현 *)
 
 let rec interp (e : Ast.expr) (t : Store.t) : Store.value = 
   match e with

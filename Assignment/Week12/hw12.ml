@@ -1,4 +1,5 @@
 (* RCFVAE를 해석하는 interpreter *)
+(* Freezed 사용 *)
 
 let rec interp (e : Ast.expr) (t : Store.t) : Store.value = 
   match e with

@@ -1,5 +1,5 @@
-(* F1VAE를 해석하는 interpreter 만들기, multiple parameter support *)
-
+(* F1VAE를 해석하는 interpreter 만들기 *)
+(* First-order fucntion *)
 
 (* 기존 interp에서 call을 확장 *)
 let rec interp_expr (e : Ast.expr) (f : Fstore.t) (s: Store.t) : Store.value = 
